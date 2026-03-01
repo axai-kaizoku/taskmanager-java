@@ -1,5 +1,6 @@
 package com.example.taskmanager.controller;
 
+import com.example.taskmanager.dto.ApiResponse;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
 import com.example.taskmanager.service.TaskService;
@@ -19,48 +20,69 @@ public class TaskController {
 
     // Get all tasks
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks(){
-        return ResponseEntity.ok(taskService.getAllTasks());
+    public ResponseEntity<ApiResponse<List<Task>>> getAllTasks(){
+        List<Task> tasks = taskService.getAllTasks();
+        return ResponseEntity.ok(ApiResponse.success("Tasks fetched successfully", tasks));
     }
 
     // Get all tasks by id
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable String id){
-        return taskService.getTaskById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<Task>> getTaskById(@PathVariable String id){
+        return taskService.getTaskById(id)
+                .map(task -> ResponseEntity.ok(ApiResponse.success("Task found", task)))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Task not found")));
     }
 
     // Create new task
     @PostMapping
-    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task){
+    public ResponseEntity<ApiResponse<Task>> createTask(@Valid @RequestBody Task task){
         Task createdTask = taskService.createTask(task);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Task created successfully", createdTask));
     }
 
     // Update task
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable String id, @Valid @RequestBody Task task) {
+    public ResponseEntity<ApiResponse<Task>> updateTask(@PathVariable String id, @Valid @RequestBody Task task) {
         try {
-            Task updatedTask = taskService.updateTask(id,task);
-            return ResponseEntity.ok(updatedTask);
+            Task updatedTask = taskService.updateTask(id, task);
+            return ResponseEntity.ok(ApiResponse.success("Task updated successfully", updatedTask));
         } catch(RuntimeException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Task not found with id: " + id));
         }
     }
 
     // Delete task
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable String id){
+    public ResponseEntity<ApiResponse<Void>> deleteTask(@PathVariable String id){
         taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success("Task deleted successfully", null));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Task>> getTasksByStatus(@PathVariable TaskStatus status) {
-        return ResponseEntity.ok(taskService.getTaskByStatus(status));
+    public ResponseEntity<ApiResponse<List<Task>>> getTasksByStatus(@PathVariable TaskStatus status) {
+        List<Task> tasks = taskService.getTaskByStatus(status);
+        return ResponseEntity.ok(ApiResponse.success("Tasks fetched successfully for status: " + status, tasks));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Task>> searchTasks(@RequestParam String keyword){
-        return ResponseEntity.ok(taskService.searchTasks(keyword));
+    public ResponseEntity<ApiResponse<List<Task>>> searchTasks(@RequestParam String keyword){
+        List<Task> tasks = taskService.searchTasks(keyword);
+        return ResponseEntity.ok(ApiResponse.success("Tasks searched successfully with keyword: " + keyword, tasks));
+    }
+
+    // Create task for specific user
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<Task>> createTaskForUser(@PathVariable String userId, @Valid @RequestBody Task task) {
+        Task createdTask = taskService.createTaskForUser(userId, task);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Task created successfully for user: " + userId, createdTask));
+    }
+
+    // Get all tasks for specific user
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<List<Task>>> getTasksByUserId(@PathVariable String userId) {
+        List<Task> tasks = taskService.getTasksByUserId(userId);
+        return ResponseEntity.ok(ApiResponse.success("Tasks fetched successfully for user: " + userId, tasks));
     }
 }

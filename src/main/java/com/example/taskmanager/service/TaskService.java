@@ -3,6 +3,7 @@ package com.example.taskmanager.service;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
 import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -15,6 +16,9 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<Task> getAllTasks(){
         return taskRepository.findAll();
     }
@@ -25,7 +29,7 @@ public class TaskService {
 
     public Task createTask(Task task){
         task.setCreatedAt(LocalDateTime.now());
-        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
         return taskRepository.save(task);
     }
 
@@ -52,4 +56,20 @@ public class TaskService {
         return taskRepository.findByTitleContainingIgnoreCase(keyword);
     }
 
+    public Task createTaskForUser(String userId, Task task) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+        task.setUserId(userId);
+        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
+        return taskRepository.save(task);
+    }
+
+    public List<Task> getTasksByUserId(String userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+        return taskRepository.findByUserId(userId);
+    }
 }

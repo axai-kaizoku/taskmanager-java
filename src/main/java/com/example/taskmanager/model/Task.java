@@ -23,6 +23,8 @@ public class Task {
 
     private TaskStatus status = TaskStatus.PENDING;
 
+    private String userId;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt = LocalDateTime.now();
