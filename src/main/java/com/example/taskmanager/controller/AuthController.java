@@ -94,7 +94,7 @@ public class AuthController {
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         return refreshTokenService.findByToken(requestRefreshToken)
@@ -105,6 +105,6 @@ public class AuthController {
                     return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully",
                             new TokenRefreshResponse(token, requestRefreshToken)));
                 })
-                .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
+                .orElseThrow(() -> new RuntimeException("Refresh token not available!"));
     }
 }
