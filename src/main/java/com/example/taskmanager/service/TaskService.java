@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.taskmanager.util.AppConstants.FIVE_MINUTES_MS;
+
 @Service
 public class TaskService {
 
@@ -19,12 +21,25 @@ public class TaskService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RedisCacheHelper cacheHelper;
+
+    final private String CACHE_TASK_PREFIX = "task:";
+
     public List<Task> getAllTasks(){
         return taskRepository.findAll();
     }
 
-    public Optional<Task> getTaskById(String id){
-        return taskRepository.findById(id);
+    public Task getTaskById(String id){
+        String key = CACHE_TASK_PREFIX+id;
+        Task cachedTask = cacheHelper.get(key,Task.class);
+        if (cachedTask != null) {
+            return cachedTask;
+        }
+        Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+
+        cacheHelper.set(key,task,FIVE_MINUTES_MS);
+        return task;
     }
 
     public Task createTask(Task task){
@@ -45,7 +60,10 @@ public class TaskService {
     }
 
     public void deleteTask(String id){
-        taskRepository.deleteById(id);
+        if (taskRepository.existsById(id)) {
+            taskRepository.deleteById(id);
+        }
+        throw new RuntimeException("Task not found with id: " + id);
     }
 
     public List<Task> getTaskByStatus(TaskStatus status){

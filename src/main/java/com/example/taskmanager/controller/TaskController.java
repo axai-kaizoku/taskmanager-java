@@ -8,12 +8,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
+@PreAuthorize("isAuthenticated()")
 public class TaskController {
     @Autowired
     public TaskService taskService;
@@ -28,9 +30,8 @@ public class TaskController {
     // Get all tasks by id
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Task>> getTaskById(@PathVariable String id){
-        return taskService.getTaskById(id)
-                .map(task -> ResponseEntity.ok(ApiResponse.success("Task found", task)))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Task not found")));
+        return ResponseEntity.ok(ApiResponse.success("Task found", taskService.getTaskById(id)));
+
     }
 
     // Create new task
