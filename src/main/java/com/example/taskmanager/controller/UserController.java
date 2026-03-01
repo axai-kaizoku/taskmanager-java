@@ -1,0 +1,29 @@
+package com.example.taskmanager.controller;
+
+import com.example.taskmanager.dto.ApiResponse;
+import com.example.taskmanager.model.User;
+import com.example.taskmanager.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    @Autowired
+    public UserService userService;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(ApiResponse.success("Users fetched successfully",users));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<User>> getUserById(@PathVariable String id) {
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(ApiResponse.success("User found",user));
+    }
+}
