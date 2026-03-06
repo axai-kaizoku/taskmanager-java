@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReferralHomePageCardDTO {
     private Integer referralCount;
+    private Integer referralRemindCount;
     private boolean isSilverCoinOrdered;
     private boolean isSilverCoinDelivered;
     private String text;
