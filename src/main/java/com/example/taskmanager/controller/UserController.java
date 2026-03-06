@@ -28,4 +28,15 @@ public class UserController {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(ApiResponse.success("User found",user));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> deleteUserById(@PathVariable String id) {
+        User user = userService.getUserById(id);
+        if (user != null) {
+            userService.deleteUserById(id);
+            return ResponseEntity.ok(ApiResponse.success("User deleted successfully", user));
+        } else {
+            return ResponseEntity.ok(ApiResponse.error("User not found with id " + id));
+        }
+    }
 }

@@ -1,0 +1,31 @@
+{
+  "bgImg": "url",
+  "header": {
+    "text": "Invite 3 friends to JAR & Win Silver Coin",
+    "textColor": "#fff",
+    "highlightedParts": [
+      { "text": "3 friends", "color": "#F8DC83" },
+      { "text": "Silver Coin", "color": "#F8DC83" }
+    ],
+    "breakAfter": [
+      "&"
+    ]
+  },
+  "subHeaderBanner": "img-link",
+  "lottie": {
+    "lottieFile": "lottile-file-link",
+    "lottieBg": "bg-file-link"
+  },
+  "marquee": {
+    "backgroundColor": "#3B165E",
+    "textColor": "#FFFFFF",
+    "messages": [
+      "Raj from Bangalore earned silver coin",
+      "Anjali from Chennai earned silver coin"
+    ]
+  },
+  "shareCTA": {
+    "text": "Invite 3 Friends",
+    "bgColor": "#197A41"
+  }
+}

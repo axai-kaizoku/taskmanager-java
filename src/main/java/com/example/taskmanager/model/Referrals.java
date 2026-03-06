@@ -12,8 +12,7 @@ public class Referrals {
     @Id
     private String id;
 
-    @DocumentReference
-    private User user;
+    private String userId;
 
     private String referralUserId;
 

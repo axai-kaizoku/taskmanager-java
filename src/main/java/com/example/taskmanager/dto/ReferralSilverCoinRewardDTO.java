@@ -19,4 +19,5 @@ public class ReferralSilverCoinRewardDTO {
     private boolean isSilverCoinCollected;
     private boolean isSilverCoinDelivered;
     private List<User> remindUsers;
+    private Object uiPayload;
 }

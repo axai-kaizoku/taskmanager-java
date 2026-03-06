@@ -4,6 +4,7 @@ import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
 import com.example.taskmanager.repository.TaskRepository;
 import com.example.taskmanager.repository.UserRepository;
+import lombok.CustomLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class TaskService {
         if (cachedTask != null) {
             return cachedTask;
         }
+
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
 
         cacheHelper.set(key,task,FIVE_MINUTES_MS);

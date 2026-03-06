@@ -2,11 +2,12 @@ package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.*;
 import com.example.taskmanager.model.RefreshToken;
-import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
 import com.example.taskmanager.security.JwtUtils;
 import com.example.taskmanager.security.UserDetailsImpl;
 import com.example.taskmanager.service.RefreshTokenService;
+import com.example.taskmanager.service.SignupService;
+import com.example.taskmanager.dto.SignupRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -31,6 +30,7 @@ public class AuthController {
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired JwtUtils jwtUtils;
     @Autowired RefreshTokenService refreshTokenService;
+    @Autowired SignupService signUpService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -55,41 +55,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.findByEmail(signUpRequest.getEmail()) != null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(ApiResponse.error("Error: Email is already in use!"));
-        }
-
-        // Create new user's account
-        User user = new User();
-        user.setEmail(signUpRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-
-        Set<String> strRoles = signUpRequest.getRoles();
-        Set<String> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            roles.add("ROLE_USER");
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        roles.add("ROLE_ADMIN");
-                        break;
-                    case "mod":
-                        roles.add("ROLE_MODERATOR");
-                        break;
-                    default:
-                        roles.add("ROLE_USER");
-                }
-            });
-        }
-
-        user.setRoles(roles);
-        userRepository.save(user);
-
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest,
+                                          @RequestParam(value = "referrerUserId", required = false) String referrerUserId) {
+        signUpService.signUpUser(signUpRequest,referrerUserId);
         return ResponseEntity.ok(ApiResponse.success("User registered successfully!", null));
     }
 
