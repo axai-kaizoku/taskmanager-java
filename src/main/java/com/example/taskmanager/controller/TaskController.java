@@ -3,6 +3,7 @@ package com.example.taskmanager.controller;
 import com.example.taskmanager.dto.ApiResponse;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.security.UserDetailsImpl;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,7 +44,10 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<ApiResponse<Task>> createTask(@Valid @RequestBody Task task){
         log.info("Creating a new task: {}", task.getTitle());
-        Task createdTask = taskService.createTask(task);
+        SecurityContext context = SecurityContextHolder.getContext();
+        Object principal = context.getAuthentication().getPrincipal();
+        String userId = ((UserDetailsImpl) principal).getId();
+        Task createdTask = taskService.createTask(task,userId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Task created successfully", createdTask));
     }
@@ -85,7 +91,7 @@ public class TaskController {
     @PostMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<Task>> createTaskForUser(@PathVariable String userId, @Valid @RequestBody Task task) {
         log.info("Creating task for user: {}. Task: {}", userId, task.getTitle());
-        Task createdTask = taskService.createTaskForUser(userId, task);
+        Task createdTask = taskService.createTask(task, userId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Task created successfully for user: " + userId, createdTask));
     }
