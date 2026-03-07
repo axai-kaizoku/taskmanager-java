@@ -1,7 +1,7 @@
 package com.example.taskmanager.security;
 
+import com.example.taskmanager.dao.UserDAO;
 import com.example.taskmanager.model.User;
-import com.example.taskmanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,11 +12,13 @@ import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    @Autowired UserRepository userRepository;
+
+    @Autowired
+    private UserDAO userDAO;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = Optional.ofNullable(userRepository.findByEmail(email))
+        User user = Optional.ofNullable(userDAO.getUserByEmail(email))
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
 
         return UserDetailsImpl.build(user);

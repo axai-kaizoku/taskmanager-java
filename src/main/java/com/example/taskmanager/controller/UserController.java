@@ -26,6 +26,9 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<User>> getUserById(@PathVariable String id) {
         User user = userService.getUserById(id);
+        if (user == null) {
+            throw new RuntimeException("User not found with id "+id);
+        }
         return ResponseEntity.ok(ApiResponse.success("User found",user));
     }
 

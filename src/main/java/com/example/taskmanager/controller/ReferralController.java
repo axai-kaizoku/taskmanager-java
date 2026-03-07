@@ -26,9 +26,8 @@ public class ReferralController {
     @GetMapping("/referralUsers")
     public ResponseEntity<ApiResponse<ReferralUsersResponse>> getReferralUsers() throws IOException {
         SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        Object principal = authentication.getPrincipal();
-        String id = ((UserDetailsImpl) principal).getId();
+        Object principal = context.getAuthentication().getPrincipal();
+        String userId = ((UserDetailsImpl) principal).getId();
         ReferralUsersResponse referralUsersResponse = referralService.getReferralUsersResponse();
         return ResponseEntity.ok(ApiResponse.success("Referral Users",referralUsersResponse));
     }

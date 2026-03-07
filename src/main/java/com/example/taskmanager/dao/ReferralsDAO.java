@@ -1,0 +1,30 @@
+package com.example.taskmanager.dao;
+
+import com.example.taskmanager.model.ReferralSource;
+import com.example.taskmanager.model.Referrals;
+import com.example.taskmanager.repository.ReferralsRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class ReferralsDAO {
+    @Autowired
+    public ReferralsRepo referralsRepository;
+
+    public ReferralSource getReferralSourceByUserId(String userId) {
+        Referrals referral = referralsRepository.findByUserId(userId);
+        return (referral != null) ? referral.getSource() : ReferralSource.NO_REFERRER;
+    }
+
+    public Integer getReferralsCountByUserId(String userId) {
+        return referralsRepository.countByUserId(userId);
+    }
+
+    public Referrals getReferralSourceByReferralUserId(String referralUserId) {
+        return referralsRepository.findByReferralUserId(referralUserId);
+    }
+
+    public Referrals saveReferralsEntry(Referrals referrals) {
+        return referralsRepository.save(referrals);
+    }
+}
