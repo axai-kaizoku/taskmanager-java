@@ -7,7 +7,6 @@ import com.example.taskmanager.service.ReferralService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +25,8 @@ public class ReferralController {
     @GetMapping("/referralUsers")
     public ResponseEntity<ApiResponse<ReferralUsersResponse>> getReferralUsers() throws IOException {
         SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        Object principal = authentication.getPrincipal();
-        String id = ((UserDetailsImpl) principal).getId();
+        Object principal = context.getAuthentication().getPrincipal();
+        String userId = ((UserDetailsImpl) principal).getId();
         ReferralUsersResponse referralUsersResponse = referralService.getReferralUsersResponse();
         return ResponseEntity.ok(ApiResponse.success("Referral Users",referralUsersResponse));
     }

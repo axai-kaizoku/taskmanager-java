@@ -2,12 +2,11 @@ package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.*;
 import com.example.taskmanager.model.RefreshToken;
-import com.example.taskmanager.repository.UserRepository;
+import com.example.taskmanager.repository.UserRepo;
 import com.example.taskmanager.security.JwtUtils;
 import com.example.taskmanager.security.UserDetailsImpl;
 import com.example.taskmanager.service.RefreshTokenService;
 import com.example.taskmanager.service.SignupService;
-import com.example.taskmanager.dto.SignupRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/auth")
 public class AuthController {
     @Autowired AuthenticationManager authenticationManager;
-    @Autowired UserRepository userRepository;
+    @Autowired UserRepo userRepository;
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired JwtUtils jwtUtils;
     @Autowired RefreshTokenService refreshTokenService;
