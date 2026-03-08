@@ -30,6 +30,10 @@ public class ReferralsDAO {
         return referralsRepository.findAllByUserIdAndSource(userId,source);
     }
 
+    public Referrals getReferralSourceByReferralUserId(String referralUserId) {
+        return referralsRepository.findByReferralUserId(referralUserId);
+    }
+
     public Referrals saveReferralsEntry(Referrals referrals) {
         return referralsRepository.save(referrals);
     }
