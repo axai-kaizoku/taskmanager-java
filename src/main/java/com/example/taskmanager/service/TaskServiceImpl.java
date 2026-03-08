@@ -118,12 +118,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void processReferralRewards(String userId) {
-        if (referAndEarnDAO.isReferAndEarnProgressEntryExists(userId)) {
+
+        Referrals referrals = referralsDAO.getReferralsByReferralUserId(userId);
+
+        if (referrals == null || referrals.getUserId() == null || referrals.getUserId().isEmpty()) {
             return;
         }
 
-        Referrals referrals = referralsDAO.getReferralSourceByReferralUserId(userId);
-        if (referrals == null || referrals.getUserId() == null || referrals.getUserId().isEmpty()) {
+        if (referrals.getSource() == ReferralSource.NO_REFERRER || referrals.getSource() == ReferralSource.DIRECT) {
+            return;
+        }
+
+        if (referrals.getSource() == ReferralSource.SILVER_COIN && referAndEarnDAO.getReferAndEarnProgressCountByReferralUIdAndSourceId(userId,referrals.getId()) >= 1) {
+            return;
+        }
+
+        if (referrals.getSource() == ReferralSource.GAMIFICATION && referAndEarnDAO.getReferAndEarnProgressCountByReferralUIdAndSourceId(userId,referrals.getId()) > 20) {
             return;
         }
 
@@ -151,6 +161,14 @@ public class TaskServiceImpl implements TaskService {
         progress.setStep(ReferralStep.INVESTMENT_REWARD);
         progress.setState(ReferralState.SUCCESS);
 
+        if (referAndEarnDAO.isReferAndEarnProgressEntryExists(referrals.getReferralUserId())) {
+            return;
+        }
+
+        // Check if user already collected the reward
+        if (referralClaimsDAO.getCountByUserIdAndReferralSourceId(referrals.getUserId(),referrals.getId()) >= 1) {
+            return;
+        }
         processGoldCouponForReferrer(referrals);
     }
 
@@ -160,11 +178,12 @@ public class TaskServiceImpl implements TaskService {
      */
     private void processGoldCouponForReferrer(Referrals referrals) {
         ReferralClaims referralClaims = new ReferralClaims();
-        referralClaims.setReferrerUId(referrals.getUserId());
+        referralClaims.setUserId(referrals.getUserId());
+        referralClaims.setClaimRefId(null);
+        referralClaims.setReferrerUId(null);
         referralClaims.setRewardType(ReferralRewardType.COUPON);
         referralClaims.setAmount(15);
         referralClaims.setReferralSourceId(referrals.getId());
-        referralClaims.setClaimRefId(referrals.getUserId());
         referralClaims.setState(ReferralState.SUCCESS);
 
         log.debug("Silver coin reward: coupon generated for referrer {}", referrals.getUserId());

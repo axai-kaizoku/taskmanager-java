@@ -6,6 +6,8 @@ import com.example.taskmanager.repository.ReferralsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class ReferralsDAO {
     @Autowired
@@ -18,6 +20,14 @@ public class ReferralsDAO {
 
     public Integer getReferralsCountByUserId(String userId) {
         return referralsRepository.countByUserId(userId);
+    }
+
+    public Referrals getReferralsByReferralUserId(String referralUserId) {
+        return referralsRepository.findByReferralUserId(referralUserId);
+    }
+
+    public List<Referrals> getReferralsByUserIdAndSource(String userId, ReferralSource source) {
+        return referralsRepository.findAllByUserIdAndSource(userId,source);
     }
 
     public Referrals getReferralSourceByReferralUserId(String referralUserId) {
