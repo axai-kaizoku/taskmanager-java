@@ -1,7 +1,7 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.dao.UserDAO;
 import com.example.taskmanager.model.User;
-import com.example.taskmanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +11,13 @@ import java.util.List;
 public class UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDAO userDAO;
 
-    public List<User> getAllUsers() { return userRepository.findAll(); }
+    public List<User> getAllUsers() { return userDAO.getAllUsers(); }
 
-    public User getUserById(String id) { return userRepository.findById(id).orElse(null); }
+    public User getUserById(String id) { return userDAO.getUserById(id); }
 
     public void deleteUserById(String id) {
-        userRepository.deleteById(id);
+        userDAO.deleteUserById(id);
     }
 }

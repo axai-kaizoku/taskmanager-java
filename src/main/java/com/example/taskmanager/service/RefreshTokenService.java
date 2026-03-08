@@ -1,8 +1,8 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.dao.RefreshTokenDAO;
+import com.example.taskmanager.dao.UserDAO;
 import com.example.taskmanager.model.RefreshToken;
-import com.example.taskmanager.repository.RefreshTokenRepository;
-import com.example.taskmanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,27 +17,27 @@ public class RefreshTokenService {
     @Value("${app.jwtRefreshExpirationMs:86400000}")
     private Long refreshTokenDurationMs;
 
-    @Autowired private RefreshTokenRepository refreshTokenRepository;
-    @Autowired private UserRepository userRepository;
+    @Autowired private RefreshTokenDAO refreshTokenDAO;
+    @Autowired private UserDAO userDAO;
 
     public Optional<RefreshToken> findByToken(String token) {
-        return refreshTokenRepository.findByToken(token);
+        return refreshTokenDAO.getRefreshTokenByToken(token);
     }
 
     public RefreshToken createRefreshToken(String userId) {
         RefreshToken refreshToken = new RefreshToken();
 
-        refreshToken.setUser(userRepository.findById(userId).get());
+        refreshToken.setUser(userDAO.getUserById(userId));
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshToken.setToken(UUID.randomUUID().toString());
 
-        refreshToken = refreshTokenRepository.save(refreshToken);
+        refreshToken = refreshTokenDAO.saveRefreshToken(refreshToken);
         return refreshToken;
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-            refreshTokenRepository.delete(token);
+            refreshTokenDAO.deleteRefreshToken(token);
             throw new RuntimeException("Refresh token was expired. Please make a new signin request");
         }
 
@@ -46,7 +46,7 @@ public class RefreshTokenService {
 
     @Transactional
     public int deleteByUserId(String userId) {
-        refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
+        refreshTokenDAO.deleteRefreshTokenByUserId(userDAO.getUserById(userId));
         return 1;
     }
 }

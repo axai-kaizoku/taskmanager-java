@@ -1,11 +1,11 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.dao.UserDAO;
 import com.example.taskmanager.dto.ReferralLevelCard;
 import com.example.taskmanager.dto.ReferralSilverCoinRewardDTO;
 import com.example.taskmanager.dto.ReferralUsersDTO;
 import com.example.taskmanager.dto.ReferralUsersResponse;
 import com.example.taskmanager.model.User;
-import com.example.taskmanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -22,14 +22,14 @@ import java.util.List;
 public class ReferralService {
 
     @Autowired
-    public UserRepository userRepository;
+    private UserDAO userDAO;
 
     @Value("classpath:payloads/silver_reward_ui_payload.json")
     Resource stateFile;
 
     public ReferralUsersResponse getReferralUsersResponse() throws IOException {
         // Fetch users from db
-        List<User> users = userRepository.findAll();
+        List<User> users = userDAO.getAllUsers();
         byte[] jsonData = Files.readAllBytes(Paths.get(stateFile.getURI()));
         ObjectMapper mapper = new ObjectMapper();
 
@@ -45,7 +45,7 @@ public class ReferralService {
         referralSilverCoinRewardDTO.setReferralList(singleItemList);
         referralSilverCoinRewardDTO.setSilverCoinCollected(false);
         referralSilverCoinRewardDTO.setSilverCoinDelivered(false);
-        referralSilverCoinRewardDTO.setRemindUsers(userRepository.findAll());
+        referralSilverCoinRewardDTO.setRemindUsers(userDAO.getAllUsers());
         referralSilverCoinRewardDTO.setUiPayload(mapper.readTree(jsonData));
 
         // Set ReferralUsersDTO

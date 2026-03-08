@@ -12,6 +12,8 @@ public class ReferralClaims {
 
     private String referrerUId;
 
+    private String referralSourceId;
+
     private ReferralRewardType rewardType;
 
     private String claimRefId;
