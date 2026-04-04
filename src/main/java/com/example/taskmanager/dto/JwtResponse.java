@@ -13,14 +13,14 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JwtResponse {
-    private String token;
+    private String accessToken;
     private String refreshToken;
     private String id;
     private String email;
     private List<String> roles;
 
     public JwtResponse(String accessToken, String refreshToken, String id, String email, List<String> roles) {
-        this.token = accessToken;
+        this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.id = id;
         this.email = email;

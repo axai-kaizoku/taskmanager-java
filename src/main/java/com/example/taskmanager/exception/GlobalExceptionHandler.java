@@ -13,12 +13,22 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+
     // Handle Route Not Found (404)
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNotFound(NoHandlerFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error("Route not found: " + ex.getRequestURL()));
+    }
+
+    // Handle Token Refresh Exceptions (401 Unauthorized)
+    @ExceptionHandler(TokenRefreshException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTokenRefreshException(TokenRefreshException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     // Handle Validation Errors (400 Bad Request)
@@ -35,11 +45,11 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("Validation failed: " + errorMessage));
     }
 
-    // Handle Runtime Exceptions (Generic Errors)
+    // Handle Runtime Exceptions (400 Bad Request)
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
